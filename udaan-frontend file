@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student & Teacher Portal</title>
+  <style>
+    :root {
+      --primary: #4A90E2;
+      --secondary: #6A5ACD;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --info: #17a2b8;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --gradient: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--gradient);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: 20px;
+      color: #2c3e50;
+    }
+    
+    .page {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      background: rgba(255,255,255,0.95);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      text-align: center;
+      animation: fadeInUp 0.7s ease forwards;
+      transform: scale(0.95);
+      opacity: 0;
+      margin: 20px 0;
+    }
+    
+    .page.active {
+      display: block;
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(40px) scale(0.95);}
+      to {opacity: 1; transform: translateY(0) scale(1);}
+    }
+    
+    h1, h2, h3 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+    }
+    
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 25px;
+    }
+    
+    .btn {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      margin: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      min-width: 200px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    
+    .btn:active {
+      transform: scale(0.97);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(45deg, #6c757d, #5a6268);
+    }
+    
+    .btn-success {
+      background: linear-gradient(45deg, var(--success), #20c997);
+    }
+    
+    .btn-warning {
+      background: linear-gradient(45deg, var(--warning), #fd7e14);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(45deg, var(--danger), #e5256e);
+    }
+    
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+      transform: scale(1.02);
+    }
+    
+    .error {
+      color: var(--danger);
+      font-size: 14px;
+      margin: -8px 0 12px;
+      text-align: left;
+      font-weight: 500;
+    }
+    
+    .btn.loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+    
+    .btn.loading::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      transform: translateY(-50%);
+    }
+    
+    @keyframes spin {
+      from {transform: translateY(-50%) rotate(0);}
+      to {transform: translateY(-50%) rotate(360deg);}
+    }
+
+    /* Success Page Options */
+    .options-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 40px;
+    }
+    
+    /* Student Dashboard Styles */
+    .dashboard {
+      max-width: 900px;
+      margin: auto;
+    }
+    
+    .menu-btn {
+      background: #fff;
+      color: var(--primary);
+      padding: 16px;
+      margin: 10px 0;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      text-align: left;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .menu-btn:hover {
+      background: #00e0ff;
+      color: #000;
+      transform: translateX(5px);
+    }
+    
+    .content {
+      display: none;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 24px;
+      border-radius: 12px;
+      margin-top: 18px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .content h3 {
+      margin-top: 0;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 10px;
+      color: var(--primary);
+    }
+    
+    .highlight {
+      color: #00e0ff;
+      font-weight: bold;
+    }
+    
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .progress-columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 25px;
+    }
+    
+    .progress-card {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    
+    .progress-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    canvas {
+      margin-top: 15px;
+      background: #fff;
+      border-radius: 8px;
+    }
+    
+    .back-btn {
+      background: var(--danger);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 20px 0;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    
+    .back-btn:hover {
+      background: #ff3333;
+      transform: translateY(-2px);
+    }
+    
+    /* Quiz Page Styling */
+    .quiz-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .quiz-header {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .question-card {
+      background: lightskyblue;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: left;
+      transition: transform 0.3s;
+    }
+    
+    .question-card:hover {
+      transform: translateY(-3px);
+    }
+    
+    .question-text {
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-size: 18px;
+    }
+    
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .option-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .option-item:hover {
+      background: lightcyan;
+      transform: translateX(5px);
+    }
+    
+    .option-item input {
+      margin-right: 15px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    
+    .option-item label {
+      cursor: pointer;
+      font-weight: 500;
+      color: #495057;
+      flex-grow: 1;
+    }
+    
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+    }
+    
+    .results-container {
+      background: lightskyblue;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 40px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .score-display {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+    
+    .correct-answer {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    .incorrect-answer {
+      color: var(--danger);
+      font-weight: 600;
+    }
+    
+    .review-item {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #7dc5e0;
+    }
+
+    /* Gravity Animation Styles */
+    .animation-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      width: 100%;
+      position: relative;
+    }
+    
+    .animation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .planet-labels {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      padding: 1.2rem 0;
+      background-color: rgba(112, 171, 199, 0.9);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    .planet-label {
+      text-align: center;
+      width: calc(100% / 5);
+    }
+    
+    .planet-label h3 {
+      margin: 0;
+      color: #333;
+      font-size: 1.1rem;
+    }
+    
+    .planet-label p {
+      margin: 0.3rem 0 0;
+      font-size: 0.9rem;
+      color: #555;
+      font-weight: 500;
+    }
+    
+    #gravity-canvas {
+      display: block;
+      width: 100%;
+      height: 60vh;
+      background: linear-gradient(to bottom, #87ceeb, #a8c0ff);
+      cursor: pointer;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    
+    .animation-controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .quiz-box {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .quiz-question {
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .animation-container {
+        grid-template-columns: 1fr;
+      }
+      
+      #gravity-canvas {
+        height: 40vh;
+      }
+      
+      .options-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .quiz-controls {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .progress-columns {
+        grid-template-columns: 1fr;
+      }
+      
+      .planet-labels {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .planet-label {
+        width: calc(50% - 10px);
+      }
+      
+      .animation-controls {
+        flex-direction: column;
+      }
+      
+      .btn {
+        min-width: unset;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="home" class="page active">
+    <h1><B>UDAAN</B></h1>
+    <h2>wings to learn</h2>
+    <p>Select your role to continue</p>
+    <button class="btn" id="student-btn">Student</button>
+    <button class="btn" id="teacher-btn">Teacher</button>
+  </div>
+
+  <div id="signup" class="page">
+    <h2>Create Your Account</h2>
+    <form id="signup-form">
+      <input type="text" id="name" placeholder="Full Name" required/>
+      <div id="name-error" class="error"></div>
+
+      <input type="text" id="contact" placeholder="Email or Phone Number" required/>
+      <div id="contact-error" class="error"></div>
+
+      <input type="password" id="password" placeholder="Password" required/>
+      <div id="password-error" class="error"></div>
+
+      <button type="submit" class="btn" id="signup-btn">Sign Up</button>
+    </form>
+  </div>
+  
+  <div id="post-signup-options" class="page">
+    <h2>Sign Up Successful! 🎉</h2>
+    <p>What would you like to do next?</p>
+    <div class="options-container">
+      <button class="btn" id="student-details-btn">👤 Student Details</button>
+      <button class="btn" id="run-animation-btn">🌌 Run Animation</button>
+      <button class="btn btn-success" id="quiz-time-btn">📝 Quiz Time</button>
+      <button class="btn btn-secondary" id="go-to-home-btn">🏠 Go to Home</button>
+    </div>
+  </div>
+
+  <!-- Student Dashboard Page -->
+  <div id="student-dashboard" class="page">
+    <button class="back-btn" onclick="showPage(postSignupOptionsPage)">
+      ← Back to Options
+    </button>
+    
+    <div class="dashboard">
+      <!-- Student Details -->
+      <div class="menu-btn" onclick="toggleContent('details')">
+        <span>👤</span> Student Details
+      </div>
+      <div class="content" id="details">
+        <h3>Student Details</h3>
+        <p><strong>Name:</strong> <span class="highlight">Rahul Manna</span></p>
+        <p><strong>School:</strong> XYZ School</p>
+        <p><strong>Languages:</strong> English</p>
+        <p><strong>Email:</strong> <span class="highlight">rahul@gmail.com</span></p>
+        <p><strong>Level:</strong> 🥇 Level 5 – Knowledge Explorer</p>
+        <p><strong>XP:</strong> 800 / 1000</p>
+      </div>
+
+      <!-- Achievements -->
+      <div class="menu-btn" onclick="toggleContent('achievements')">
+        <span>🏆</span> Achievements
+      </div>
+      <div class="content" id="achievements">
+        <h3>Achievements</h3>
+        <ul>
+          <li>✅ Completed Newton Laws</li>
+          <li>🧩 Unlocked "Motion Master" badge</li>
+          <li>🔥 10-day learning streak</li>
+          <li>🥉 Top 3 in HOTS Challenge</li>
+        </ul>
+      </div>
+
+      <!-- Progress Tracker -->
+      <div class="menu-btn" onclick="toggleContent('progress')">
+        <span>📊</span> Progress Tracker
+      </div>
+      <div class="content" id="progress">
+        <h3>Progress Tracker</h3>
+        <div class="progress-columns">
+          <div class="progress-card">
+            <h4>✅ Work Done</h4>
+            <ul>
+              <li>Pythagoras Theorem</li>
+              <li>Newton's Law</li>
+            </ul>
+          </div>
+          <div class="progress-card">
+            <h4>🕒 Pending</h4>
+            <ul>
+              <li>Cell Division</li>
+            </ul>
+          </div>
+          <div class="progress-card">
+            <h4>📈 Graphical View</h4>
+            <canvas id="progressChart" width="200" height="150"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Done -->
+      <div class="menu-btn" onclick="toggleContent('workdone')">
+        <span>📁</span> Work Done
+      </div>
+      <div class="content" id="workdone">
+        <h3>Work Done</h3>
+        <ul>
+          <li>📝 Pythagoras Theorem Practice</li>
+          <li>⚙ Newton's Law Experiment</li>
+        </ul>
+      </div>
+
+      <!-- Logout -->
+      <div class="menu-btn" onclick="toggleContent('logout')">
+        <span>🚪</span> Logout
+      </div>
+      <div class="content" id="logout">
+        <h3>Logout</h3>
+        <p>You have been logged out successfully.</p>
+        <button class="btn btn-danger" onclick="showPage(homePage)">Return to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="animation" class="page">
+    <div class="animation-header">
+      <h2>Multi-Planet Gravity Simulator</h2>
+      <button class="back-btn" onclick="showPage(postSignupOptionsPage)">
+        ← Back to Options
+      </button>
+    </div>
+    
+    <div class="animation-container">
+      <!-- Left: Animation -->
+      <div>
+        <div class="planet-labels">
+          <div class="planet-label"><h3>Earth</h3><p>g = 9.8 m/s²</p></div>
+          <div class="planet-label"><h3>Moon</h3><p>g = 1.62 m/s²</p></div>
+          <div class="planet-label"><h3>Jupiter</h3><p>g = 24.79 m/s²</p></div>
+          <div class="planet-label"><h3>Sun</h3><p>g = 274 m/s²</p></div>
+          <div class="planet-label"><h3>Venus</h3><p>g = 8.87 m/s²</p></div>
+        </div>
+        <canvas id="gravity-canvas" width="700" height="400"></canvas>
+        <div class="animation-controls">
+          <button class="btn" id="start-animation-btn">Start / Pause</button>
+          <button class="btn btn-warning" id="reset-animation-btn">Reset</button>
+        </div>
+      </div>
+
+      <!-- Right: Quiz -->
+      <div class="quiz-box">
+        <h3>Quick Quiz</h3>
+        <div class="quiz-question">
+          Q1: Which celestial body has the highest gravity?
+        </div>
+        <div class="options-list">
+          <div class="option-item">
+            <input type="radio" id="earth" name="q1" value="Earth">
+            <label for="earth">Earth</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="moon" name="q1" value="Moon">
+            <label for="moon">Moon</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="jupiter" name="q1" value="Jupiter">
+            <label for="jupiter">Jupiter</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="sun" name="q1" value="Sun">
+            <label for="sun">Sun</label>
+          </div>
+        </div>
+        <button class="btn" id="submit-quiz">Submit Answer</button>
+        <p id="quiz-result"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="quiz-time" class="page">
+    <div class="quiz-container">
+      <div class="quiz-header">
+        <h2>Gravity Knowledge Quiz</h2>
+        <p>Test your knowledge about planetary gravity with these 5 questions</p>
+      </div>
+      
+      <form id="quiz-form">
+        <div class="question-card">
+          <div class="question-text">1. Which celestial body has the strongest gravitational force?</div>
+          <div class="options-list">
+            <div class="option-item">
+              <input type="radio" id="q1-a" name="q1" value="A">
+              <label for="q1-a">A) Earth</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q1-b" name="q1" value="B">
+              <label for="q1-b">B) Jupiter</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q1-c" name="q1" value="C">
+              <label for="q1-c">C) Sun</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q1-d" name="q1" value="D">
+              <label for="q1-d">D) Moon</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="question-card">
+          <div class="question-text">2. On which planet would you weigh the least?</div>
+          <div class="options-list">
+            <div class="option-item">
+              <input type="radio" id="q2-a" name="q2" value="A">
+              <label for="q2-a">A) Jupiter</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q2-b" name="q2" value="B">
+              <label for="q2-b">B) Earth</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q2-c" name="q2" value="C">
+              <label for="q2-c">C) Moon</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q2-d" name="q2" value="D">
+              <label for="q2-d">D) Venus</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="question-card">
+          <div class="question-text">3. How does gravity affect time according to Einstein's theory of relativity?</div>
+          <div class="options-list">
+            <div class="option-item">
+              <input type="radio" id="q3-a" name="q3" value="A">
+              <label for="q3-a">A) Time runs faster in stronger gravity</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q3-b" name="q3" value="B">
+              <label for="q3-b">B) Time runs slower in stronger gravity</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q3-c" name="q3" value="C">
+              <label for="q3-c">C) Gravity has no effect on time</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q3-d" name="q3" value="D">
+              <label for="q3-d">D) It stops time completely</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="question-card">
+          <div class="question-text">4. What is the approximate gravity on Mars compared to Earth?</div>
+          <div class="options-list">
+            <div class="option-item">
+              <input type="radio" id="q4-a" name="q4" value="A">
+              <label for="q4-a">A) About 1/3 of Earth's gravity</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q4-b" name="q4" value="B">
+              <label for="q4-b">B) About 1/2 of Earth's gravity</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q4-c" name="q4" value="C">
+              <label for="q4-c">C) About the same as Earth's gravity</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q4-d" name="q4" value="D">
+              <label for="q4-d">D) About 2 times Earth's gravity</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="question-card">
+          <div class="question-text">5. Which factor primarily determines a planet's gravity?</div>
+          <div class="options-list">
+            <div class="option-item">
+              <input type="radio" id="q5-a" name="q5" value="A">
+              <label for="q5-a">A) Its distance from the Sun</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q5-b" name="q5" value="B">
+              <label for="q5-b">B) Its magnetic field</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q5-c" name="q5" value="C">
+              <label for="q5-c">C) Its mass and size</label>
+            </div>
+            <div class="option-item">
+              <input type="radio" id="q5-d" name="q5" value="D">
+              <label for="q5-d">D) Its atmospheric composition</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="quiz-controls">
+          <button type="button" class="btn btn-secondary" id="back-to-options">Back to Options</button>
+          <button type="submit" class="btn btn-success" id="submit-quiz-time">Submit Answers</button>
+        </div>
+      </form>
+      
+      <div id="quiz-results" class="results-container" style="display: none;">
+        <h3>Your Quiz Results</h3>
+        <div class="score-display">Score: <span id="score-value">0</span>/5</div>
+        <div id="results-breakdown"></div>
+        <button class="btn" id="try-again-btn">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Page elements
+    const homePage = document.getElementById('home');
+    const signupPage = document.getElementById('signup');
+    const postSignupOptionsPage = document.getElementById('post-signup-options');
+    const studentDashboardPage = document.getElementById('student-dashboard');
+    const animationPage = document.getElementById('animation');
+    const quizTimePage = document.getElementById('quiz-time');
+    
+    // Buttons
+    const studentBtn = document.getElementById('student-btn');
+    const teacherBtn = document.getElementById('teacher-btn');
+    const signupForm = document.getElementById('signup-form');
+    const signupBtn = document.getElementById('signup-btn');
+    const studentDetailsBtn = document.getElementById('student-details-btn');
+    const runAnimationBtn = document.getElementById('run-animation-btn');
+    const quizTimeBtn = document.getElementById('quiz-time-btn');
+    const goToHomeBtn = document.getElementById('go-to-home-btn');
+    const backToOptionsBtn = document.getElementById('back-to-options');
+    const submitQuizTimeBtn = document.getElementById('submit-quiz-time');
+    const tryAgainBtn = document.getElementById('try-again-btn');
+    const resetAnimationBtn = document.getElementById('reset-animation-btn');
+    
+    // Form fields
+    const name = document.getElementById('name');
+    const contact = document.getElementById('contact');
+    const password = document.getElementById('password');
+    
+    // Quiz answers
+    const correctAnswers = {
+      q1: "C",
+      q2: "C",
+      q3: "B",
+      q4: "A",
+      q5: "C"
+    };
+
+    // Page navigation
+    function showPage(page) {
+      if (running) {
+        running = false;
+        cancelAnimationFrame(animationId);
+      }
+      [homePage, signupPage, postSignupOptionsPage, studentDashboardPage, animationPage, quizTimePage].forEach(p => p.classList.remove('active'));
+      page.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    
+    studentBtn.addEventListener('click', () => showPage(signupPage));
+    teacherBtn.addEventListener('click', () => showPage(signupPage));
+    studentDetailsBtn.addEventListener('click', () => {
+      showPage(studentDashboardPage);
+      // Initialize chart when dashboard is shown
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Work Done', 'Pending'],
+          datasets: [{
+            data: [2, 1],
+            backgroundColor: ['#00e0ff', '#ff4d4d']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            }
+          }
+        }
+      });
+    });
+    runAnimationBtn.addEventListener('click', () => {
+      showPage(animationPage);
+      initializeAnimation();
+    });
+    quizTimeBtn.addEventListener('click', () => showPage(quizTimePage));
+    goToHomeBtn.addEventListener('click', () => showPage(homePage));
+    backToOptionsBtn.addEventListener('click', () => showPage(postSignupOptionsPage));
+    tryAgainBtn.addEventListener('click', () => {
+      document.getElementById('quiz-form').reset();
+      document.getElementById('quiz-results').style.display = 'none';
+      document.getElementById('quiz-form').style.display = 'block';
+    });
+
+    // Toggle content sections in dashboard
+    function toggleContent(id) {
+      const section = document.getElementById(id);
+      const isVisible = section.style.display === 'block';
+
+      // Hide all sections
+      document.querySelectorAll('.content').forEach(sec => sec.style.display = 'none');
+
+      // Show selected section
+      if (!isVisible) {
+        section.style.display = 'block';
+      }
+    }
+
+    // Form validation
+    function displayError(input, message) {
+      document.getElementById(input.id + '-error').innerText = message;
+    }
+    
+    function resetErrors() {
+      ['name-error','contact-error','password-error'].forEach(id => {
+        document.getElementById(id).innerText = '';
+      });
+    }
+    
+    function validateForm() {
+      let isValid = true;
+      resetErrors();
+      
+      if (name.value.trim() === '') {
+        displayError(name, 'Name is required.');
+        isValid = false;
+      }
+      
+      if (contact.value.trim() === '') {
+        displayError(contact, 'Email or Phone is required.');
+        isValid = false;
+      } else {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phonePattern = /^[0-9]{10}$/;
+        
+        if (!(emailPattern.test(contact.value.trim()) || phonePattern.test(contact.value.trim()))) {
+          displayError(contact, 'Enter valid Email or 10-digit Phone.');
+          isValid = false;
+        }
+      }
+      
+      if (password.value.trim() === '') {
+        displayError(password, 'Password is required.');
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+    
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (validateForm()) {
+        signupBtn.classList.add('loading');
+        setTimeout(() => {
+          signupBtn.classList.remove('loading');
+          showPage(postSignupOptionsPage);
+        }, 1000);
+      }
+    });
+
+    // Quiz Time submission
+    document.getElementById('quiz-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      let score = 0;
+      let resultsHTML = '';
+      
+      // Check answers
+      for (let i = 1; i <= 5; i++) {
+        const questionName = 'q' + i;
+        const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+        const userAnswer = selectedOption ? selectedOption.value : 'Not answered';
+        const isCorrect = userAnswer === correctAnswers[questionName];
+        
+        if (isCorrect) score++;
+        
+        resultsHTML += `
+          <div class="review-item">
+            <p><strong>Question ${i}:</strong> ${document.querySelector(`.question-card:nth-child(${i}) .question-text`).textContent}</p>
+            <p class="${isCorrect ? 'correct-answer' : 'incorrect-answer'}">
+              Your answer: ${userAnswer} ${isCorrect ? '✓' : '✗'}
+            </p>
+            ${!isCorrect ? `<p class="correct-answer">Correct answer: ${correctAnswers[questionName]}</p>` : ''}
+          </div>
+        `;
+      }
+      
+      // Display results
+      document.getElementById('score-value').textContent = score;
+      document.getElementById('results-breakdown').innerHTML = resultsHTML;
+      document.getElementById('quiz-form').style.display = 'none';
+      document.getElementById('quiz-results').style.display = 'block';
+    });
+
+    // Gravity Animation
+    const canvas = document.getElementById('gravity-canvas');
+    const ctx = canvas.getContext('2d');
+    const planetsData = [
+      { name: 'Earth 🌍', g: 9.8, groundColor: '#28a745', ballColor: ['#90ee90', '#006400'] },
+      { name: 'Moon 🌝', g: 1.62, groundColor: '#95a5a6', ballColor: ['#f5f5f5', '#808080'] },
+      { name: 'Jupiter 🌕', g: 24.79, groundColor: '#8a4b08', ballColor: ['#ff9966', '#8b4513'] },
+      { name: 'Sun ☀', g: 274, groundColor: '#ffcc00', ballColor: ['#ffff99', '#ff9900'] },
+      { name: 'Venus 🌑', g: 8.87, groundColor: '#a0522d', ballColor: ['#deb887', '#a0522d'] }
+    ];
+    const NUM_PLANETS = planetsData.length;
+    let balls = [], animationId, running = false;
+
+    function initializeAnimation() {
+      balls = planetsData.map((planet, index) => ({
+        x: (canvas.width / (NUM_PLANETS * 2)) * (2 * index + 1),
+        y: 50, radius: 25, time: 0, initialY: 50,
+        gravity: planet.g, groundColor: planet.groundColor, ballColor: planet.ballColor
+      }));
+      if (animationId) cancelAnimationFrame(animationId);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      drawStaticElements();
+      document.getElementById('start-animation-btn').innerText = 'Start Animation';
+    }
+    
+    function drawStaticElements() {
+      const segmentWidth = canvas.width / NUM_PLANETS;
+      balls.forEach((ball, index) => {
+        if (index > 0) {
+          ctx.beginPath();
+          ctx.moveTo(segmentWidth * index, 0);
+          ctx.lineTo(segmentWidth * index, canvas.height);
+          ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1; ctx.stroke(); ctx.closePath();
+        }
+        ctx.beginPath();
+        ctx.rect(segmentWidth * index, canvas.height - 40, segmentWidth, 40);
+        ctx.fillStyle = ball.groundColor; ctx.fill(); ctx.closePath();
+      });
+    }
+    
+    function drawBall(ball) {
+      const gradient = ctx.createRadialGradient(ball.x, ball.y, ball.radius*0.1, ball.x, ball.y, ball.radius);
+      gradient.addColorStop(0, ball.ballColor[0]); gradient.addColorStop(1, ball.ballColor[1]);
+      ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+      ctx.fillStyle = gradient; ctx.fill(); ctx.closePath();
+    }
+    
+    function update() {
+      const deltaTime = 1/60;
+      balls.forEach(ball => {
+        if (ball.y + ball.radius < canvas.height - 40) {
+          ball.time += deltaTime;
+          const distance = 0.5 * ball.gravity * Math.pow(ball.time,2);
+          ball.y = ball.initialY + distance * 5;
+        } else {
+          ball.y = canvas.height - 40 - ball.radius;
+        }
+      });
+      if (balls.every(ball => ball.y + ball.radius >= canvas.height - 40)) {
+        running = false; 
+        cancelAnimationFrame(animationId);
+        document.getElementById('start-animation-btn').innerText = 'Restart Animation';
+      }
+    }
+    
+    function draw() {
+      if (!running) return;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      drawStaticElements();
+      balls.forEach(ball => drawBall(ball));
+      update();
+      animationId = requestAnimationFrame(draw);
+    }
+    
+    document.getElementById('start-animation-btn').addEventListener('click', () => {
+      if (running) {
+        running = false; 
+        cancelAnimationFrame(animationId);
+        document.getElementById('start-animation-btn').innerText = 'Resume Animation';
+      } else {
+        running = true;
+        if (balls.every(ball => ball.y + ball.radius >= canvas.height - 40)) initializeAnimation();
+        draw(); 
+        document.getElementById('start-animation-btn').innerText = 'Pause Animation';
+      }
+    });
+    
+    resetAnimationBtn.addEventListener('click', initializeAnimation);
+
+    // Simple quiz logic
+    const quizSubmitBtn = document.getElementById('submit-quiz');
+    const quizResult = document.getElementById('quiz-result');
+    
+    quizSubmitBtn.addEventListener('click', () => {
+      const answer = document.querySelector('input[name="q1"]:checked');
+      if (!answer) {
+        quizResult.className = 'incorrect-answer';
+        quizResult.innerHTML = "Please select an answer!";
+        return;
+      }
+      
+      if (answer.value === "Sun") {
+        quizResult.className = 'correct-answer';
+        quizResult.innerHTML = "✅ Correct! The Sun has the highest gravity.";
+      } else {
+        quizResult.className = 'incorrect-answer';
+        quizResult.innerHTML = "❌ Incorrect! The correct answer is Sun.";
+      }
+    });
+    
+    // Initialize the animation when page loads
+    window.addEventListener('load', initializeAnimation);
+  </script>
+</body>
+</html>
